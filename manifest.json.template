@@ -1,0 +1,16 @@
+{
+    "name": "JiraWorklog",
+    "description": "This extension is made for demonstration purposes",
+    "author": "Marius Klint Hansen | TheKlinto",
+    "version": "1.0",
+    "manifest_version": 3,
+    "key": "",
+    "permissions": [
+        "identity",
+        "storage"
+    ],
+    "background": {
+        "service_worker": "src/background.ts"
+    },
+    "action": {}
+}

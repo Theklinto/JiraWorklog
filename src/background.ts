@@ -1,5 +1,6 @@
 import { MessageTypes } from "@/chromeService";
 import { v4 as uuidv4 } from "uuid";
+import { MessagingService } from "./messagingService";
 
 //Open index on action icon click
 chrome.action.onClicked.addListener(() => {
@@ -27,6 +28,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return true;
 });
+
+MessagingService.getEvents().forEach((event) => {
+    event.registerEvent(chrome.runtime.onMessage);
+});
+
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//     const eventMessage = message as MessagePayload<any>;
+//     if(eventMessage?.eventKey === MessageEventKeys.GetLocalStorageItem){
+//         chrome.storage.local.get(eventMessage.)
+//     }
+
+//     return true;
+// })
 
 // async function getAuthRequestKey() {
 //   const uuid = uuidv4();

@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { ChromeService } from "@/chromeService";
+import { MessagingService } from "@/messagingService";
 import { ref, onMounted } from "vue";
 
 const loading = ref(true);
@@ -72,6 +73,8 @@ async function beginAuthenticationFlow() {
 
     const result = await ChromeService.launchAuthenticationFlow();
     if (result !== undefined) {
+        console.log("Saving authResult: ", result);
+        await MessagingService.storeAuthenticationStatus.invoke(result);
         emit("authenticated", true);
     }
 }

@@ -110,13 +110,13 @@ export class ChromeService {
         return accountId;
     }
 
-    static async storeKey<TModel>(key: StorageKeys, model: TModel) {
+    static async storeKey<TModel>(key: StorageKeys | string, model: TModel) {
         const storageObject: { [key: string]: any } = {};
-        storageObject[StorageKeys.UserAuthentication] = JSON.stringify(model);
+        storageObject[key] = JSON.stringify(model);
         chrome.storage.local.set(storageObject);
     }
 
-    static async fetchKey<TModel>(key: StorageKeys): Promise<TModel | undefined> {
+    static async fetchKey<TModel>(key: StorageKeys | string): Promise<TModel | undefined> {
         return new Promise<TModel | undefined>((resolve) => {
             chrome.storage.local.get(key, (items) => {
                 try {

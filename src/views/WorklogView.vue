@@ -43,6 +43,7 @@ import WorklogService from "@/worklogService";
 import { type Ref, ref } from "vue";
 import { Issue } from "@/models/jira/jiraModels";
 import { CalenderOverviewModel } from "@/models/calenderOverviewModel";
+import { MessagingService } from "@/messagingService";
 
 const timespanInDays = 14;
 const issues: Ref<Issue[]> = ref([]);
@@ -52,6 +53,12 @@ onBeforeMount(async () => {
     issues.value = (await WorklogService.fetchIssuesByJQL()) ?? [];
     overview.value = groupByDay(issues.value);
     console.log("Overview", overview.value);
+
+    const test = await MessagingService.getAuthenticationStatus.invoke();
+    console.log("Response from MessagingService: ", test);
+
+    const authResult = await MessagingService.getAuthentication.invoke();
+    console.log("Auth result from service: ", authResult);
 });
 
 function groupByDay(issues: Issue[]): CalenderOverviewModel {

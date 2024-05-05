@@ -28,6 +28,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <td colspan="100">
+                        <button
+                            disabled
+                            title="Currently in development"
+                            class="btn btn-primary w-100"
+                        >
+                            Add custom worklog
+                        </button>
+                    </td>
+                </tr>
+                <tr>
                     <td>Sum</td>
                     <td v-for="day in overview.days" :key="'sum:' + day.displayDate">
                         {{ getTimeSpentDisplayString(day.worklogSumInSeconds) }}

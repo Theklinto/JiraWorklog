@@ -23,8 +23,6 @@ export default class WorklogService {
             }
         );
 
-        console.log("test", result);
-
         if (result.data?.issues) {
             result.data.issues.filter((issue) => {
                 if (issue.fields?.worklog?.worklogs) {

@@ -1,12 +1,7 @@
 <template>
     <div class="text-white center">
-        <div v-if="loading">
-            <div class="spinner-border" role="status">
-                <span>Loading...</span>
-            </div>
-            <p>{{ loadingText }}</p>
-        </div>
-        <div v-else>
+        <SpinnerComponent :is-loading="loading" :loading-text="loadingText" />
+        <div v-if="!loading">
             <div class="p-5">
                 {{ resultText }}
             </div>
@@ -20,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 import AuthenticationService, { AuthenticationStatus } from "@/services/authenticationService";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -65,7 +61,7 @@ async function getAuthenticationStatus() {
 
 async function beginAuthenticationFlow() {
     loading.value = true;
-    loadingText.value = "Requesting acess to Jira. A popup should open shortly.";
+    loadingText.value = "Requesting access to Jira. A popup should open shortly.";
     showLoginButton.value = false;
 
     const authResult = await AuthenticationService.launchAuthenticationFlow();

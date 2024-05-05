@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <div class="w-100 d-flex justify-content-end p-3">
-            <button class="btn btn-primary mr-3" @click="logAllStoredData">Log stored data</button>
+    <div class="p-3">
+        <div class="w-100 d-flex justify-content-end">
+            <button class="btn btn-primary me-3" @click="logAllStoredData">Log stored data</button>
             <RouterLink
                 :to="{ name: 'login', replace: true }"
                 class="btn btn-primary"
@@ -9,7 +9,7 @@
                 >Clear stored data</RouterLink
             >
         </div>
-        <RouterView />
+        <RouterView class="pt-5" />
     </div>
 </template>
 

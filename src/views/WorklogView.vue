@@ -1,14 +1,10 @@
 <template>
-    <div class="p-5">
-        <div v-if="loading" class="center text-white">
-            <div class="spinner-border">
-                <span>Fetching worklogs...</span>
-            </div>
-        </div>
-        <table v-else class="table table-bordered table-striped table-dark">
+    <div>
+        <SpinnerComponent :is-loading="loading" loading-text="Fetching worklogs..." />
+        <table v-if="!loading" class="table table-bordered table-striped table-dark">
             <thead class="sticky-header table-dark">
                 <tr>
-                    <th class="issue-col">Issue Key</th>
+                    <th class="issue-col">Issue</th>
                     <th
                         class="small-col"
                         v-for="day in overview.days"
@@ -47,6 +43,7 @@ import WorklogService from "@/worklogService";
 import { type Ref, ref, onMounted } from "vue";
 import { Issue } from "@/models/jira/jiraModels";
 import { CalenderOverviewModel } from "@/models/calenderOverviewModel";
+import SpinnerComponent from "@/components/SpinnerComponent.vue";
 
 const timespanInDays = 14;
 const issues: Ref<Issue[]> = ref([]);
@@ -57,6 +54,7 @@ const loading = ref(true);
 onMounted(async () => {
     issues.value = (await WorklogService.fetchIssuesByJQL()) ?? [];
     overview.value = groupByDay(issues.value);
+    loading.value = false;
     console.log("Overview", overview.value);
 });
 

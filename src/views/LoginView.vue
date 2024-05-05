@@ -2,7 +2,7 @@
     <div class="text-white center">
         <div v-if="loading">
             <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span>Loading...</span>
             </div>
             <p>{{ loadingText }}</p>
         </div>
@@ -10,44 +10,29 @@
             <div class="p-5">
                 {{ resultText }}
             </div>
-            <div class="d-flex justify-content-center">
-                <button
-                    v-if="showLoginButton"
-                    @click="beginAuthenticationFlow"
-                    class="btn btn-primary"
-                >
-                    Log into Jira
+            <div v-if="showLoginButton" class="d-flex justify-content-center">
+                <button @click="beginAuthenticationFlow" class="btn btn-primary">
+                    Authenticate using Jira
                 </button>
             </div>
         </div>
-        <!-- <div>
-            <button class="btn btn-secondary" @click="getAuthenticationStatus">Refresh</button>
-        </div>
-        <div>
-            <button class="btn btn-secondary" @click="ChromeService.clearStoredData">
-                Clear data
-            </button>
-        </div> -->
     </div>
 </template>
 
 <script setup lang="ts">
-import { ChromeService } from "@/chromeService";
-import { MessagingService } from "@/messagingService";
-import { ref, onMounted } from "vue";
+import AuthenticationService, { AuthenticationStatus } from "@/services/authenticationService";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const loading = ref(true);
 const loadingText = ref("");
 
+const router = useRouter();
+
 const resultText = ref("");
 const showLoginButton = ref(false);
 
-const emit = defineEmits<{
-    (e: "authenticated", isAuthenticated: boolean): void;
-}>();
-
-onMounted(async () => {
-    await ChromeService.clearStoredData();
+onMounted(() => {
     getAuthenticationStatus();
 });
 
@@ -55,36 +40,45 @@ async function getAuthenticationStatus() {
     loadingText.value = "Fetching stored access token...";
     loading.value = true;
 
-    const isAuthenticated = await ChromeService.isAuthenticated();
-    if (isAuthenticated.authenticated) {
-        resultText.value = "Access token has been fetched!";
-        emit("authenticated", true);
-    } else {
-        resultText.value = "No access token registered";
-        showLoginButton.value = true;
+    const authStatus = await AuthenticationService.getAuthenticationStatus();
+    switch (authStatus) {
+        case AuthenticationStatus.Authenticated: {
+            resultText.value = "Access token has been fetched!";
+            router.push({ name: "home" });
+            break;
+        }
+        case AuthenticationStatus.UseRefreshToken: {
+            resultText.value = "Reauthentication using refresh token is not yet supported";
+            loading.value = false;
+            showLoginButton.value = true;
+            console.log("Use refresh token!");
+            break;
+        }
+        case AuthenticationStatus.NotAuthenticated: {
+            resultText.value = "No access token registered";
+            showLoginButton.value = true;
+            loading.value = false;
+            break;
+        }
     }
-    loading.value = false;
 }
 
 async function beginAuthenticationFlow() {
     loading.value = true;
-    loadingText.value = "Requesting acess to Jira. A popup will open.";
+    loadingText.value = "Requesting acess to Jira. A popup should open shortly.";
     showLoginButton.value = false;
 
-    const result = await ChromeService.launchAuthenticationFlow();
-    if (result !== undefined) {
-        console.log("Saving authResult: ", result);
-        await MessagingService.storeAuthenticationStatus.invoke(result);
-        emit("authenticated", true);
+    const authResult = await AuthenticationService.launchAuthenticationFlow();
+    if (authResult) {
+        console.log("User has been correctly authenticated");
+        router.push({ name: "home" });
+        return;
     }
+
+    loading.value = false;
+    loadingText.value = "An error occured while fetching token.";
+    showLoginButton.value = true;
 }
 </script>
 
-<style scoped>
-.center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-</style>
+<style></style>

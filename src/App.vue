@@ -1,16 +1,40 @@
 <template>
     <div>
-        <LoginView v-if="!isAuthenticated" @authenticated="(value) => (isAuthenticated = value)" />
-        <WorklogView v-else />
+        <div class="w-100 d-flex justify-content-end p-3">
+            <button class="btn btn-primary mr-3" @click="logAllStoredData">Log stored data</button>
+            <RouterLink
+                :to="{ name: 'login', replace: true }"
+                class="btn btn-primary"
+                @click="clearAllData"
+                >Clear stored data</RouterLink
+            >
+        </div>
+        <RouterView />
     </div>
 </template>
 
 <script setup lang="ts">
-import LoginView from "./views/LoginView.vue";
-import WorklogView from "./views/WorklogView.vue";
-import { ref } from "vue";
+import { RouterLink, RouterView } from "vue-router";
+import { MessagingService } from "./messagingService";
 
-const isAuthenticated = ref(false);
+async function clearAllData() {
+    await MessagingService.clearStoredData.invoke();
+}
+
+async function logAllStoredData() {
+    const storedData = await MessagingService.getStoredData.invoke();
+    console.group("Stored data");
+    Object.keys(storedData).forEach((key) => {
+        let data: string | object;
+        try {
+            data = JSON.parse(storedData[key]);
+        } catch {
+            data = storedData[key];
+        }
+        console.log(`Key: ${key}`, "value =>", data);
+    });
+    console.groupEnd();
+}
 </script>
 
 <style scoped>

@@ -1,6 +1,11 @@
 <template>
     <div class="p-5">
-        <table class="table table-bordered table-striped table-dark">
+        <div v-if="loading" class="center text-white">
+            <div class="spinner-border">
+                <span>Fetching worklogs...</span>
+            </div>
+        </div>
+        <table v-else class="table table-bordered table-striped table-dark">
             <thead class="sticky-header table-dark">
                 <tr>
                     <th class="issue-col">Issue Key</th>
@@ -38,24 +43,21 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
 import WorklogService from "@/worklogService";
-import { type Ref, ref } from "vue";
+import { type Ref, ref, onMounted } from "vue";
 import { Issue } from "@/models/jira/jiraModels";
 import { CalenderOverviewModel } from "@/models/calenderOverviewModel";
-import { MessagingService } from "@/messagingService";
 
 const timespanInDays = 14;
 const issues: Ref<Issue[]> = ref([]);
 const overview = ref(new CalenderOverviewModel(timespanInDays));
 
-onBeforeMount(async () => {
+const loading = ref(true);
+
+onMounted(async () => {
     issues.value = (await WorklogService.fetchIssuesByJQL()) ?? [];
     overview.value = groupByDay(issues.value);
     console.log("Overview", overview.value);
-
-    const authResult = await MessagingService.getAuthentication.invoke();
-    console.log("Auth result from service: ", authResult);
 });
 
 function groupByDay(issues: Issue[]): CalenderOverviewModel {

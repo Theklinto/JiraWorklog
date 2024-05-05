@@ -1,7 +1,6 @@
-import type UserAuthenticationModel from "@/models/userAuthenticationModel";
-import { MessageEvent, type MessagePayload } from "./messageEvent";
-import { ChromeService } from "@/chromeService";
-import { LocalStoageKeys } from "@/messagingService";
+import UserAuthenticationModel from "@/models/userAuthenticationModel";
+import { MessageEvent, type MessagePayload } from "@/events/messageEvent";
+import { StoreAuthenticationEvent } from "@/events/auth/storeAuthenticationEvent";
 
 export class GetAuthenticationEvent extends MessageEvent<
     undefined,
@@ -13,8 +12,8 @@ export class GetAuthenticationEvent extends MessageEvent<
         sender: unknown,
         sendResponse: (response: UserAuthenticationModel | undefined) => void
     ) => void = (payload, sender, sendResponse) => {
-        ChromeService.fetchKey<UserAuthenticationModel>(
-            LocalStoageKeys.UserAuthenticationModel
-        ).then((model) => sendResponse(model));
+        this.fetchKey<UserAuthenticationModel>(StoreAuthenticationEvent.storageKey).then((model) =>
+            sendResponse(model)
+        );
     };
 }

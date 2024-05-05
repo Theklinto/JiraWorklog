@@ -1,13 +1,20 @@
+import { MessagingService } from "@/messagingService";
 import FetchService from "./fetchService";
 import { Worklog, type Issue } from "./models/jira/jiraModels";
 import type IssuesSearchResult from "./models/paginationModel";
-import { useAuthStore } from "./stores/authStore";
 
 export default class WorklogService {
     static async fetchIssuesByJQL(): Promise<Issue[] | undefined> {
-        const authStore = useAuthStore();
+        const authModel = await MessagingService.getAuthentication.invoke();
+        if (authModel?.cloudId === undefined) {
+            return Promise.reject("CloudId not specified on AuthModel");
+        }
+        if (authModel?.accountId === undefined) {
+            return Promise.reject("AccountId is not specified");
+        }
+
         const result = await FetchService.fetchModel<IssuesSearchResult>(
-            `https://api.atlassian.com/ex/jira/${authStore.cloudId}/rest/api/3/search`,
+            `https://api.atlassian.com/ex/jira/${authModel.cloudId}/rest/api/3/search`,
             {
                 queryParams: new URLSearchParams([
                     ["jql", 'worklogAuthor = currentUser() and worklogDate >= "-14d"'],
@@ -23,7 +30,7 @@ export default class WorklogService {
                 if (issue.fields?.worklog?.worklogs) {
                     issue.fields.worklog.worklogs = issue.fields.worklog.worklogs.filter(
                         (worklog) => {
-                            if (worklog.author?.accountId == authStore.accountId) {
+                            if (worklog.author?.accountId == authModel.accountId) {
                                 return worklog;
                             }
                         }

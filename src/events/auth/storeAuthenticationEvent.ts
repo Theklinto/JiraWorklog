@@ -1,17 +1,17 @@
 import type UserAuthenticationModel from "@/models/userAuthenticationModel";
-import { MessageEvent, type MessagePayload } from "./messageEvent";
-import { ChromeService } from "@/chromeService";
-import { LocalStoageKeys } from "@/messagingService";
+import { MessageEvent, type MessagePayload } from "@/events/messageEvent";
 
 export class StoreAuthenticationEvent extends MessageEvent<UserAuthenticationModel, void> {
-    eventKey: string = "f65856a5-6a3b-4822-b250-cf652dea8fc5";
+    static storageKey: string = "f65856a5-6a3b-4822-b250-cf652dea8fc5";
+    eventKey: string = StoreAuthenticationEvent.storageKey;
+
     eventHandler: (
         payload: MessagePayload<UserAuthenticationModel>,
         sender: unknown,
         sendResponse: (response: void) => void
     ) => void = (payload, sender, sendResponse) => {
-        ChromeService.storeKey(LocalStoageKeys.UserAuthenticationModel, payload.eventParams).then(
-            () => sendResponse()
+        this.storeKey(StoreAuthenticationEvent.storageKey, payload.eventParams).then(() =>
+            sendResponse()
         );
     };
 }

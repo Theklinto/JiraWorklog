@@ -1,4 +1,3 @@
-import { GetAuthenticationStatusEvent } from "./events/getAuthenticationStatusEvent";
 import { MessageEvent } from "@/events/messageEvent";
 import { StoreAuthenticationEvent } from "./events/storeAuthenticationEvent";
 import { GetAuthenticationEvent } from "./events/getAuthenticationEvent";
@@ -10,7 +9,6 @@ export enum LocalStoageKeys {
 
 export class MessagingService {
     //Events
-    static getAuthenticationStatus = new GetAuthenticationStatusEvent();
     static storeAuthenticationStatus = new StoreAuthenticationEvent();
     static getAuthentication = new GetAuthenticationEvent();
 

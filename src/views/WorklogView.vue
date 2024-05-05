@@ -54,9 +54,6 @@ onBeforeMount(async () => {
     overview.value = groupByDay(issues.value);
     console.log("Overview", overview.value);
 
-    const test = await MessagingService.getAuthenticationStatus.invoke();
-    console.log("Response from MessagingService: ", test);
-
     const authResult = await MessagingService.getAuthentication.invoke();
     console.log("Auth result from service: ", authResult);
 });

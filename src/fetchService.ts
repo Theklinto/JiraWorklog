@@ -1,6 +1,5 @@
-import { ChromeService, StorageKeys } from "./chromeService";
+import { MessagingService } from "@/messagingService";
 import type UserAuthenticationModel from "./models/userAuthenticationModel";
-import { useAuthStore } from "./stores/authStore";
 
 export default class FetchService {
     static async fetchModel<TModel>(
@@ -9,18 +8,18 @@ export default class FetchService {
         requiresAuth: boolean = true
     ): Promise<{ data?: TModel; response?: Response }> {
         const headers: HeadersInit = [];
-        const authStore = useAuthStore();
         if (fetchModel) {
             if (fetchModel.queryParams) {
                 url = url + "?" + fetchModel.queryParams.toString();
             }
         }
         if (requiresAuth) {
-            const auth = await ChromeService.fetchKey<UserAuthenticationModel>(
-                StorageKeys.UserAuthentication
-            );
+            const authModel = await MessagingService.getAuthentication.invoke();
+            if (!authModel) {
+                return Promise.reject("User is not authenticated");
+            }
 
-            headers.push(["Authorization", `Bearer ${authStore.accessToken}`]);
+            headers.push(["Authorization", `Bearer ${authModel.accessToken}`]);
         }
 
         let result: TModel | undefined;

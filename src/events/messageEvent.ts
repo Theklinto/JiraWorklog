@@ -29,6 +29,31 @@ export abstract class MessageEvent<TParam, TResult> {
             return true;
         });
     }
+
+    protected async storeKey<TModel>(key: string, model: TModel) {
+        const storageObject: { [key: string]: any } = {};
+        storageObject[key] = JSON.stringify(model);
+        chrome.storage.local.set(storageObject);
+    }
+
+    protected async fetchKey<TModel>(key: string): Promise<TModel | undefined> {
+        return new Promise<TModel | undefined>((resolve) => {
+            chrome.storage.local.get(key, (items) => {
+                try {
+                    const localModel = JSON.parse(items[key]);
+                    if (localModel) {
+                        resolve(localModel as TModel);
+                    }
+                } catch {
+                    resolve(undefined);
+                }
+            });
+        });
+    }
+
+    protected async clearStoredData(): Promise<void> {
+        await chrome.storage.local.clear();
+    }
 }
 
 type invokeEvent<TParam, TResult> = undefined extends TParam

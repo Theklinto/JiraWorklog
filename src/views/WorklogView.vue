@@ -27,7 +27,7 @@
                         {{ getTimeSpentDisplayString(day.worklogs[key]?.timeSpentSeconds ?? 0) }}
                     </td>
                 </tr>
-                <tr>
+                <tr v-if="false">
                     <td colspan="100">
                         <button
                             disabled

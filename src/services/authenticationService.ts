@@ -14,10 +14,49 @@ export default class AuthenticationService {
             return AuthenticationStatus.Authenticated;
         }
         if (authModel && authModel.refreshToken !== undefined) {
-            return AuthenticationStatus.UseRefreshToken;
+            const reuslt = await this.consumeRefreshToken(authModel);
+            if (reuslt) {
+                await MessagingService.storeAuthentication.invoke(authModel);
+                console.log("Access token has been refreshed");
+                return AuthenticationStatus.Authenticated;
+            }
         }
 
         return AuthenticationStatus.NotAuthenticated;
+    }
+
+    /**
+     * Provided object will be modified with new data if successfull.
+     * Returns a boolean indicating result
+     */
+    static async consumeRefreshToken(authModel: UserAuthenticationModel): Promise<boolean> {
+        if (authModel.refreshToken === undefined) {
+            return false;
+        }
+
+        const payload = {
+            grant_type: "refresh_token",
+            client_id: import.meta.env.VITE_CLIENT_ID,
+            client_secret: import.meta.env.VITE_CLIENT_SECRET,
+            refresh_token: authModel.refreshToken
+        };
+        const result = await fetch("https://auth.atlassian.com/oauth/token", {
+            body: JSON.stringify(payload),
+            method: "POST",
+            headers: [["content-type", "application/json"]]
+        });
+
+        if (!result.ok) {
+            return false;
+        }
+
+        const newAuthData = UserAuthenticationModel.parse(await result.json());
+        authModel.accessToken = newAuthData.accessToken;
+        authModel.expirationDate = newAuthData.expirationDate;
+        authModel.refreshToken = newAuthData.refreshToken;
+        authModel.scope = newAuthData.scope;
+
+        return true;
     }
 
     /**

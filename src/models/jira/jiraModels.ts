@@ -173,6 +173,11 @@ export class WorklogAuthor {
 export class WorklogComment {
     type?: string;
     version?: number;
+    content?: WorklogCommentPart[];
+}
+
+export class WorklogCommentPart {
+    type?: string;
     content?: { type?: string; text?: string }[];
 }
 
@@ -224,6 +229,10 @@ export class Watcher {
 export class IssueFields {
     summary?: string;
     worklog?: WorklogPaginationModel;
+
+    //Custom fields
+    customIssue: boolean = false;
+    persistantIssue: boolean = false;
 }
 
 export class WorklogPaginationModel {

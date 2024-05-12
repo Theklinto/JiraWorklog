@@ -6,7 +6,8 @@
                     <th class="issue-col"></th>
                     <th class="issue-col"></th>
                     <th class="small-col" v-for="day in dateColumns" :key="day.getTime()">
-                        {{ getDayName(day) + " " + getDate(day).split(" ")[0] }}
+                        {{ getDayName(day) }} <br />
+                        {{ getDate(day).split(" ")[0] }}
                     </th>
                 </tr>
             </thead>
@@ -31,7 +32,7 @@
 <script setup lang="ts">
 import type WorklogCollection from "@/models/worklogCollection";
 import { getComparableDate, getDate, getDayName } from "@/utils/dateUtils";
-import { onBeforeMount, onMounted, ref, type Ref } from "vue";
+import { onBeforeMount, ref, type Ref } from "vue";
 import CollectionRowTableComponent from "./CollectionRowTableComponent.vue";
 
 interface Props {

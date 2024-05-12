@@ -23,7 +23,7 @@ import { Worklog } from "@/models/jira/jiraModels";
 import WorklogCollection from "@/models/worklogCollection";
 import { getComparableDate, sameDay } from "@/utils/dateUtils";
 import { v4 as uuidv4 } from "uuid";
-import { type Ref, ref, onMounted, type ComputedRef, computed, onBeforeMount } from "vue";
+import { type Ref, ref, onBeforeMount } from "vue";
 
 interface Props {
     dateColumns: Date[];
